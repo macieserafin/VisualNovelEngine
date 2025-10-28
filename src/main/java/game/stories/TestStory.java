@@ -13,12 +13,16 @@ public class TestStory {
         intro.addOption(new Option("Spij dalej", "alive"));
 
         Scene dead = new Scene("dead", "Za okna wyskoczyl demon i cie zabil");
+        dead.setEndingScene(true);
 
         Scene alive = new Scene("alive", "Poszedles dalej spac i przezyles noc");
+        alive.setEndingScene(true);
 
         scenes.put("intro", intro);
         scenes.put("dead", dead);
         scenes.put("alive", alive);
+
+
 
         return scenes;
     }

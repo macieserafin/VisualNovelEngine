@@ -7,6 +7,7 @@ public class Scene {
     private String id; //(np. "hotel_room_1")
     private String description; //in game
     private List<Option> options; //lista wyborów
+    private boolean isEndingScene = false;
 
     public Scene(String id, String description) {
         this.id = id;
@@ -49,5 +50,14 @@ public class Scene {
         for (Option option : options) {
             System.out.println(option);
         }
+    }
+
+
+    public boolean isEndingScene() {
+        return isEndingScene;
+    }
+
+    public void setEndingScene(boolean endingScene) {
+        this.isEndingScene = endingScene;
     }
 }
