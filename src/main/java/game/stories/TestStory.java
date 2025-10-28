@@ -8,14 +8,14 @@ public class TestStory {
     public static Map<String, Scene> createScenes(){
         Map<String, Scene> scenes = new HashMap<>();
 
-        Scene intro = new Scene("intro", "Dzien 0: Budzisz sie w malym pokoju. Za oknem ciemno. ");
-        intro.addOption(new Option("Wstan z lozka", "dead"));
-        intro.addOption(new Option("Spij dalej", "alive"));
+        Scene intro = new Scene("intro", "Day 0: You wake up in a small room. It's dark outside.");
+        intro.addOption(new Option("Get out of bed", "dead"));
+        intro.addOption(new Option("Go back to sleep", "alive"));
 
-        Scene dead = new Scene("dead", "Za okna wyskoczyl demon i cie zabil");
+        Scene dead = new Scene("dead", "A demon bursts through the window and kills you instantly.");
         dead.setEndingScene(true);
 
-        Scene alive = new Scene("alive", "Poszedles dalej spac i przezyles noc");
+        Scene alive = new Scene("alive", "You went back to sleep and survived the night.");
         alive.setEndingScene(true);
 
         scenes.put("intro", intro);

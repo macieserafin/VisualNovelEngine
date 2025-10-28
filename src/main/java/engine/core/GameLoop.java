@@ -49,8 +49,8 @@ public class GameLoop {
             console.readLine();
 
             stop();
-            console.close(); // 🔥 ZAMYKA OKNO
-            System.exit(0);  // 🔥 KOŃCZY PROCES PROGRAMU
+            console.close();
+            System.exit(0);
             return;
         }
 
