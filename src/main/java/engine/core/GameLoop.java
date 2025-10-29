@@ -4,93 +4,113 @@ import engine.input.InputHandler;
 import engine.story.Option;
 import engine.story.Scene;
 import engine.story.StoryManager;
+import engine.story.blocks.Block;
+import engine.story.blocks.Choice;
 import engine.ui.ConsoleWindow;
-import game.GameManager;
+import engine.ui.RenderManager;
 import game.stories.TestStory;
 
 public class GameLoop {
     private boolean running = true;
-    private StoryManager storyManager = new StoryManager();
-    private GameManager gameManager = new GameManager();
-    ConsoleWindow console = new ConsoleWindow("Visual Novel Engine", 800, 600);
 
-    private int playerChoice = -1;
-
-    public void start(){
+    private final StoryManager storyManager = new StoryManager();
+    private final ConsoleWindow console = new ConsoleWindow("Visual Novel Engine", 800, 600);
+    private final RenderManager renderer = new RenderManager(console);
 
 
+    private Scene currentScene;
+    private int currentBlockIndex = 0;
+    private Option chosenOption = null;
+
+    public void start() {
         System.out.println("GameLoop started!");
 
-        gameManager.setupGame(storyManager);
+        InputHandler.initialize(console);
 
-        while (running){
+        storyManager.addScene(TestStory.createScenes());
+        storyManager.setActiveScene(TestStory.getStartScene());
+        currentScene = storyManager.getActiveScene();
+
+
+        while (running) {
             render();
             input();
             update();
         }
-
-        System.out.println("GameLoop Ended!");
     }
+
+
     private void render() {
-        Scene current = storyManager.getActiveScene();
-
-        if (current == null) {
-            console.println("No active scene found!");
-            stop();
+        if (currentScene == null) {
+            console.println("No active scene — end of the game.");
+            exit();
             return;
         }
 
-        console.clear();
-        console.println(current.getContent());
-
-        if (gameManager.isEndScene(current)) {
-            console.println("\n[End of the game]");
-            console.println("Press ENTER to exit...");
-            console.readLine();
-
-            stop();
-            console.close();
-            System.exit(0);
-            return;
-        }
-
-        if (current.getOptions().isEmpty()) {
-            console.println("\n[No options found!]");
-            stop();
-            return;
-        }
-
-        int i = 1;
-        for (var option : current.getOptions()) {
-            console.println(i + ". " + option.getDescription());
-            i++;
+        Block currentBlock = getCurrentBlock();
+        if (currentBlock != null) {
+            renderer.render(currentBlock);
         }
     }
 
-    private void input(){
-        String input = console.readLine();
 
-        try {
-            playerChoice = Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            console.println("Please enter a valid number!");
-            playerChoice = -1;
+    private void input() {
+        Block currentBlock = getCurrentBlock();
+
+        if (currentBlock instanceof Choice) {
+            Choice choice = (Choice) currentBlock;
+
+            if (choice.hasOptions()) {
+                int choiceIndex = InputHandler.getChoice(1, choice.getOptions().size());
+                chosenOption = choice.getOptions().get(choiceIndex - 1);
+            }
+        } else {
+
         }
     }
-    private void update(){
-        if(playerChoice == -1){
-            stop();
+
+    private void update() {
+        Block currentBlock = getCurrentBlock();
+
+
+        if (chosenOption != null) {
+            storyManager.setActiveScene(chosenOption.getNextSceneId());
+            currentScene = storyManager.getActiveScene();
+            currentBlockIndex = 0;
+            chosenOption = null;
             return;
         }
 
-        storyManager.performChoice(playerChoice);
 
+        if (currentBlockIndex + 1 >= currentScene.getBlocks().size()) {
+            if (currentScene.isEndingScene()) {
+                console.println("[End of scene / day]");
+                exit();
+            } else {
+                exit();
+            }
+        } else {
+
+            currentBlockIndex++;
+        }
     }
 
-    public void stop(){
+    private Block getCurrentBlock() {
+        if (currentScene == null) return null;
+        if (currentScene.getBlocks().isEmpty()) return null;
+        if (currentBlockIndex < 0 || currentBlockIndex >= currentScene.getBlocks().size()) return null;
+        return currentScene.getBlocks().get(currentBlockIndex);
+    }
+
+
+
+    private void exit() {
         running = false;
+        console.println("Press Enter to close...");
+
+        console.readLine();
+
+        System.exit(0);
     }
-
-
 
 }

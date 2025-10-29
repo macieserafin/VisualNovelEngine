@@ -47,10 +47,10 @@ public class ConsoleWindow {
         frame.setVisible(true);
     }
 
-    public void print(String text) {
-        textArea.append(text);
-        textArea.setCaretPosition(textArea.getDocument().getLength());
-    }
+//    public void print(String text) {
+//        textArea.append(text);
+//        textArea.setCaretPosition(textArea.getDocument().getLength());
+//    }
 
     public void println(String text) {
         print(text + "\n");
@@ -70,6 +70,39 @@ public class ConsoleWindow {
     }
 
     public void close() {
-        frame.dispose(); // zamyka okno
+        frame.dispose();
     }
+
+    public void print(String text) {
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            textArea.append(text);
+            textArea.setCaretPosition(textArea.getDocument().getLength());
+        });
+    }
+
+    public void type(String text, int delayMs) {
+        if (text == null) return;
+        for (int i = 0; i < text.length(); i++) {
+            final char ch = text.charAt(i);
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                textArea.append(String.valueOf(ch));
+                textArea.setCaretPosition(textArea.getDocument().getLength());
+            });
+            try {
+                Thread.sleep(delayMs);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            textArea.append("\n");
+            textArea.setCaretPosition(textArea.getDocument().getLength());
+        });
+    }
+
+    public void waitForEnter() throws InterruptedException {
+        inputQueue.take();
+    }
+
 }

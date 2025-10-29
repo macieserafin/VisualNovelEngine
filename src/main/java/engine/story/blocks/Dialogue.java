@@ -13,4 +13,12 @@ public class Dialogue extends Block {
     public void display() {
         System.out.println(speaker + ": " + content);
     }
+
+    public String getSpeaker() {
+        return speaker;
+    }
+
+    public void setSpeaker(String speaker) {
+        this.speaker = speaker;
+    }
 }

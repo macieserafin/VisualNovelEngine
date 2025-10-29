@@ -5,49 +5,34 @@ import engine.story.blocks.Block;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Scene extends Block {
+public class Scene {
 
-    private String title;
-    private List<Option> options = new ArrayList<>();
+    private final String id;
+    private final List<Block> blocks = new ArrayList<>();
+    private boolean endingScene;
 
-    private boolean isEndingScene = false;
-
-
-    public Scene(String title, String text) {
-        super(text);
-        this.title = title;
+    public Scene(String id) {
+        this.id = id;
     }
 
-
-    public String getTitle() {
-        return title;
+    public String getId() {
+        return id;
     }
 
-    public void addOption(Option option) {
-        options.add(option);
+    public Scene addBlock(Block block) {
+        blocks.add(block);
+        return this;
     }
 
-
-    public List<Option> getOptions() {
-        return options;
+    public List<Block> getBlocks() {
+        return blocks;
     }
-
-
-    @Override
-    public void display() {
-        System.out.println("\n== " + title + " ==");
-        System.out.println(content);
-        for (int i = 0; i < options.size(); i++) {
-            System.out.println((i + 1) + ". " + options.get(i).getDescription());
-        }
-    }
-
 
     public boolean isEndingScene() {
-        return isEndingScene;
+        return endingScene;
     }
 
     public void setEndingScene(boolean endingScene) {
-        this.isEndingScene = endingScene;
+        this.endingScene = endingScene;
     }
 }
