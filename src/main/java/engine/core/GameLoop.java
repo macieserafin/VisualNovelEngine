@@ -41,7 +41,7 @@ public class GameLoop {
         }
 
         console.clear();
-        console.println(current.getDescription());
+        console.println(current.getContent());
 
         if (gameManager.isEndScene(current)) {
             console.println("\n[End of the game]");

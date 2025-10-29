@@ -1,54 +1,44 @@
 package engine.story;
 
+import engine.story.blocks.Block;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class Scene {
-    private String id; //(np. "hotel_room_1")
-    private String description; //in game
-    private List<Option> options; //lista wyborów
+public class Scene extends Block {
+
+    private String title;
+    private List<Option> options = new ArrayList<>();
+
     private boolean isEndingScene = false;
 
-    public Scene(String id, String description) {
-        this.id = id;
-        this.description = description;
-        this.options = new ArrayList<Option>();
+
+    public Scene(String title, String text) {
+        super(text);
+        this.title = title;
+    }
+
+
+    public String getTitle() {
+        return title;
     }
 
     public void addOption(Option option) {
         options.add(option);
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     public List<Option> getOptions() {
         return options;
     }
 
-    public void setOptions(List<Option> options) {
-        this.options = options;
-    }
 
+    @Override
     public void display() {
-        System.out.println("\nScene [" + id + "]");
-        System.out.println(description);
-        System.out.println();
-        for (Option option : options) {
-            System.out.println(option);
+        System.out.println("\n== " + title + " ==");
+        System.out.println(content);
+        for (int i = 0; i < options.size(); i++) {
+            System.out.println((i + 1) + ". " + options.get(i).getDescription());
         }
     }
 
