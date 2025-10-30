@@ -1,7 +1,7 @@
 # Visual Novel Engine — Changelog
 
 ## v0.1.1a (Hotfix)
-**Release date:** _2025-10-30_
+**Release date:** _2025-10-31_
 
 ### 🛠️ Hotfix
 - Fixed non-functional **Exit** button on toolbar — now gracefully closes the game
