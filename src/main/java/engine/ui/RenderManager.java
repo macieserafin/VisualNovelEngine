@@ -58,6 +58,7 @@ public class RenderManager {
             Option opt = block.getOptions().get(i);
             console.println((i + 1) + ". " + opt.getDescription());
         }
+        console.println("");
     }
     private void promptToContinue() throws InterruptedException {
         console.println("[Press Enter to continue...]");

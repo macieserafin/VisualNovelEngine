@@ -21,7 +21,6 @@ public class InputHandler {
                 String input = console.readLine();
                 choice = Integer.parseInt(input.trim());
             } catch (NumberFormatException e) {
-                console.println("Wpisz liczbę od " + min + " do " + max + ".");
             }
         }
         return choice;
