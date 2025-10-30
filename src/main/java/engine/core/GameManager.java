@@ -23,6 +23,21 @@ public class GameManager {
     private Option chosenOption = null;
 
     public void initialize() {
+
+        console.setToolbarListener(new ConsoleWindow.ToolbarListener() {
+            @Override public void onSave() { /* TODO */ }
+
+            @Override public void onLoad() { /* TODO */ }
+
+            @Override public void onSettings() { /* TODO */ }
+
+            @Override public void onMenu() { /* TODO */ }
+
+            @Override public void onExit() {
+                onExitRequested();
+            }
+        });
+
         InputHandler.initialize(console);
         StoryInitializer.setup(storyManager);
         sceneController = new SceneController(storyManager);
@@ -75,6 +90,13 @@ public class GameManager {
     public boolean isRunning() {
         return running;
     }
+
+    public void onExitRequested() {
+        console.println("[Exiting game...]");
+        shutdown();
+        System.exit(0);
+    }
+
 
     private void exit() {
         running = false;
