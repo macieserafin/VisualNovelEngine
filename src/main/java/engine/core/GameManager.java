@@ -33,9 +33,7 @@ public class GameManager {
 
             @Override public void onMenu() { /* TODO */ }
 
-            @Override public void onExit() {
-                onExitRequested();
-            }
+            @Override public void onExit() {onExitRequested();}
         });
 
         InputHandler.initialize(console);
@@ -92,11 +90,11 @@ public class GameManager {
     }
 
     public void onExitRequested() {
-        console.println("[Exiting game...]");
+        console.println("");
+        console.printlnColored("[Exiting game...]", new Color(0, 255, 0));
         shutdown();
         System.exit(0);
     }
-
 
     private void exit() {
         running = false;
