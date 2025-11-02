@@ -2,9 +2,7 @@ package game;
 
 import engine.core.GameLoop;
 import engine.core.GameManager;
-import engine.ui.ConsoleWindow;
 
-import java.awt.*;
 
 
 

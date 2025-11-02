@@ -19,6 +19,7 @@ public class ConsoleWindow {
     private final JLabel promptLabel;
     private final JPanel toolbarPanel;
     private final BlockingQueue<String> inputQueue = new LinkedBlockingQueue<>();
+    private volatile boolean skipWait = false;
 
     private int dragOffsetX, dragOffsetY;
     private ToolbarListener toolbarListener;
@@ -193,7 +194,6 @@ public class ConsoleWindow {
         }
     }
 
-    public void waitForEnter() { readLine(); }
 
     public void close() { frame.dispose(); }
 
@@ -256,6 +256,28 @@ public class ConsoleWindow {
             e.printStackTrace();
         }
     }
+
+    public void skipWaiting() {
+        skipWait = true;
+        inputQueue.offer("");
+    }
+
+    public void waitForEnter() {
+        try {
+            while (true) {
+                String input = inputQueue.take();
+                if (skipWait || input.isEmpty()) {
+                    break;
+                }
+            }
+        } catch (InterruptedException ignored) {}
+        skipWait = false;
+    }
+
+    public void clearInputQueue() {
+        inputQueue.clear();
+    }
+
 
 
 }

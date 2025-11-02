@@ -7,6 +7,7 @@ public class SceneController {
     private Scene currentScene;
     private int currentBlockIndex = 0;
 
+
     public SceneController(StoryManager storyManager) {
         this.storyManager = storyManager;
         this.currentScene = storyManager.getActiveScene();

@@ -7,6 +7,7 @@ import engine.story.StoryManager;
 import engine.story.blocks.Block;
 import engine.story.blocks.Choice;
 import engine.ui.ConsoleWindow;
+import engine.ui.MenuManager;
 import engine.ui.RenderManager;
 import game.StoryInitializer;
 
@@ -19,6 +20,8 @@ public class GameManager {
     private final ConsoleWindow console = new ConsoleWindow("Visual Novel Engine", 1000, 1000);
     private final RenderManager renderer = new RenderManager(console);
     private SceneController sceneController;
+    MenuManager menuManager = new MenuManager(console, this);
+    private GameState gameState = GameState.PLAYING;
 
     private Option chosenOption = null;
 
@@ -31,17 +34,20 @@ public class GameManager {
 
             @Override public void onSettings() { /* TODO */ }
 
-            @Override public void onMenu() { /* TODO */ }
+            @Override public void onMenu() { requestMenu(); }
 
             @Override public void onExit() {onExitRequested();}
         });
 
+
         InputHandler.initialize(console);
-        StoryInitializer.setup(storyManager);
-        sceneController = new SceneController(storyManager);
+
+        console.showToolbar(false);
+        menuManager.showMainMenu();
     }
 
     public void render() {
+
         Block currentBlock = sceneController.getCurrentBlock();
         if (currentBlock != null) {
             renderer.render(currentBlock);
@@ -53,6 +59,7 @@ public class GameManager {
     }
 
     public void handleInput() {
+
         Block currentBlock = sceneController.getCurrentBlock();
 
         if (currentBlock instanceof Choice choice && choice.hasOptions()) {
@@ -73,20 +80,52 @@ public class GameManager {
         }
 
         if (sceneController.isSceneEnded()) {
-            if (sceneController.isEndingScene()) {
-                console.println("");
-                console.printlnColored("[End of scene / day]", new Color(0, 255, 0));
-                exit();
-            } else {
+            console.println("");
+            console.printlnColored("[End of scene / day]", new Color(0, 255, 0));
+
+            if (sceneController.getCurrentBlock() == null) {
+                console.waitForEnter();
                 exit();
             }
-        } else {
-            sceneController.advanceBlock();
+            return;
         }
+
+        sceneController.advanceBlock();
+    }
+
+    public void startGame() {
+        console.clear();
+        console.showToolbar(true);
+        console.printlnColored("[Starting new game...]\n", new Color(0, 255, 0));
+
+        StoryInitializer.setup(storyManager);
+        sceneController = new SceneController(storyManager);
+        gameState = GameState.PLAYING;
+        running = true;
     }
 
     public boolean isRunning() {
         return running;
+    }
+
+    public void requestMenu() {
+        console.skipWaiting();
+        gameState = GameState.MAIN_MENU;
+        console.showToolbar(false);
+
+    }
+
+    public void requestContinue() {
+        gameState = GameState.PLAYING;
+        console.showToolbar(true);
+    }
+
+    public GameState getState() {
+        return gameState;
+    }
+
+    public ConsoleWindow getConsole() {
+        return console;
     }
 
     public void onExitRequested() {
@@ -100,9 +139,7 @@ public class GameManager {
         running = false;
         console.println("");
         console.printlnColored("Press Enter to close...", new Color(0, 255, 0));
-        console.readLine();
-        shutdown();
-        System.exit(0);
+        requestMenu();
     }
 
     public void shutdown() {
