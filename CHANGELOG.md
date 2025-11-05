@@ -1,7 +1,5 @@
 # Visual Novel Engine — Changelog
 
-# Visual Novel Engine — Changelog
-
 ## v0.1.2 (Main Menu & Flow Update)
 - Added Main Menu displayed immediately on startup
 - Added 'Start Game' and 'Exit' options
