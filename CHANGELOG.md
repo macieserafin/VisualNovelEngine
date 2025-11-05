@@ -1,4 +1,4 @@
-<img width="398" height="1022" alt="image" src="https://github.com/user-attachments/assets/a0661e9b-4547-4f48-b55b-6ef77c1feee6" /># Visual Novel Engine — Changelog
+# Visual Novel Engine — Changelog
 
 # Visual Novel Engine — Changelog
 
