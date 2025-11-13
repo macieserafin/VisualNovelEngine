@@ -1,9 +1,9 @@
 package engine.core;
 
 import engine.ui.ConsoleWindow;
-import engine.ui.MenuManager;
-
-import java.io.Console;
+import engine.ui.CreatorRenderer;
+import engine.ui.MenuRenderer;
+import engine.ui.SettingsRenderer;
 
 public class GameLoop {
     private final GameManager gameManager;
@@ -23,15 +23,25 @@ public class GameLoop {
             GameState state = gameManager.getState();
 
             switch (state) {
-                case MAIN_MENU -> {
-                    MenuManager menu = new MenuManager(console, gameManager);
-                    menu.showMainMenu();
-                    gameManager.requestContinue();
-                }
                 case PLAYING -> {
                     gameManager.render();
                     gameManager.handleInput();
                     gameManager.update();
+                }
+                case MAIN_MENU -> {
+                    MenuRenderer menu = new MenuRenderer(console, gameManager);
+                    menu.showMainMenu();
+                    gameManager.requestContinue();
+                }
+                case SETTINGS -> {
+                    SettingsRenderer settings = new SettingsRenderer(console, gameManager);
+                    settings.showSettingsMenu();
+                    gameManager.requestContinue();
+                }
+                case CREATOR -> {
+                    CreatorRenderer creator = new CreatorRenderer(console, gameManager);
+                    creator.createCharacter();
+                    gameManager.requestContinue();
                 }
             }
         }

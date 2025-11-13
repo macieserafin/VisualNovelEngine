@@ -1,6 +1,8 @@
 package engine.ui;
 
+import engine.core.GameManager;
 import engine.story.Option;
+import engine.story.SceneController;
 import engine.story.blocks.*;
 import engine.story.blocks.Choice;
 
@@ -9,6 +11,7 @@ import java.awt.*;
 public class RenderManager {
 
     private final ConsoleWindow console;
+    private final GameManager gameManager;
     private static final int TYPE_SPEED_MS = 17;
 
     private static final Color COLOR_NARRATION = new Color(255, 255, 255);
@@ -18,8 +21,9 @@ public class RenderManager {
     private static final Color COLOR_CHOICE = new Color(213, 255, 252);
     private static final Color COLOR_SEPARATOR = new Color(80, 80, 80);
 
-    public RenderManager(ConsoleWindow console) {
+    public RenderManager(ConsoleWindow console, GameManager gameManager) {
         this.console = console;
+        this.gameManager = gameManager;
     }
 
     public void render(Block block) {
@@ -32,7 +36,9 @@ public class RenderManager {
                 renderMonologue(m);
             } else if (block instanceof Choice c) {
                 renderChoice(c);
-            } else {
+            } else if (block instanceof Action a) {
+                gameManager.handleAction(a);
+            }else {
                 console.println("[Unknown block]");
             }
         } catch (InterruptedException e) {

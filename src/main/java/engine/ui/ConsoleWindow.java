@@ -21,6 +21,9 @@ public class ConsoleWindow {
     private final BlockingQueue<String> inputQueue = new LinkedBlockingQueue<>();
     private volatile boolean skipWait = false;
 
+    public int width = 800;
+    public int height = 800;
+
     private int dragOffsetX, dragOffsetY;
     private ToolbarListener toolbarListener;
 
@@ -29,6 +32,7 @@ public class ConsoleWindow {
     public static final Color COLOR_BG = new Color(20, 20, 20);
     public static final Color COLOR_INPUT_BG = new Color(18, 18, 18);
     public static final Color COLOR_TOOLBAR = new Color(25, 25, 25);
+
 
     public interface ToolbarListener {
         void onSave();
@@ -42,8 +46,8 @@ public class ConsoleWindow {
         this.toolbarListener = l;
     }
 
-    public ConsoleWindow(String title, int width, int height) {
-        frame = new JFrame(title);
+    public ConsoleWindow() {
+        frame = new JFrame("Visual Novel Engine");
         frame.setUndecorated(true);
         frame.setSize(width, height);
         frame.setLocationRelativeTo(null);
@@ -276,6 +280,13 @@ public class ConsoleWindow {
 
     public void clearInputQueue() {
         inputQueue.clear();
+    }
+
+    public void setResolution(int width, int height) {
+        this.width = width;
+        this.height = height;
+
+        frame.setSize(width, height);
     }
 
 

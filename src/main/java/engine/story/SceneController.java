@@ -34,6 +34,17 @@ public class SceneController {
         return currentScene != null && currentBlockIndex >= currentScene.getBlocks().size();
     }
 
+    public boolean isActionBlock() {
+        Block block = getCurrentBlock();
+        return block instanceof engine.story.blocks.Action;
+    }
+
+    public engine.story.blocks.Action getActionBlock() {
+        Block block = getCurrentBlock();
+        if (block instanceof engine.story.blocks.Action ab) return ab;
+        return null;
+    }
+
     public boolean isEndingScene() {
         return currentScene != null && currentScene.isEndingScene();
     }

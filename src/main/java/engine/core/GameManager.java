@@ -1,14 +1,17 @@
 package engine.core;
 
+import engine.character.CharacterManager;
 import engine.input.InputHandler;
 import engine.story.Option;
 import engine.story.SceneController;
 import engine.story.StoryManager;
+import engine.story.blocks.Action;
 import engine.story.blocks.Block;
 import engine.story.blocks.Choice;
 import engine.ui.ConsoleWindow;
-import engine.ui.MenuManager;
+import engine.ui.MenuRenderer;
 import engine.ui.RenderManager;
+import engine.ui.SettingsRenderer;
 import game.StoryInitializer;
 
 import java.awt.*;
@@ -17,11 +20,14 @@ public class GameManager {
     private boolean running = true;
 
     private final StoryManager storyManager = new StoryManager();
-    private final ConsoleWindow console = new ConsoleWindow("Visual Novel Engine", 1000, 1000);
-    private final RenderManager renderer = new RenderManager(console);
+    private final ConsoleWindow console = new ConsoleWindow();
     private SceneController sceneController;
-    MenuManager menuManager = new MenuManager(console, this);
+    private final RenderManager renderer = new RenderManager(console, this);
+    MenuRenderer menuRenderer = new MenuRenderer(console, this);
+    SettingsRenderer settingsRenderer = new SettingsRenderer(console, this);
+    CharacterManager characterManager = new CharacterManager();
     private GameState gameState = GameState.PLAYING;
+
 
     private Option chosenOption = null;
 
@@ -32,7 +38,7 @@ public class GameManager {
 
             @Override public void onLoad() { /* TODO */ }
 
-            @Override public void onSettings() { /* TODO */ }
+            @Override public void onSettings() { requestSettings(); }
 
             @Override public void onMenu() { requestMenu(); }
 
@@ -43,12 +49,12 @@ public class GameManager {
         InputHandler.initialize(console);
 
         console.showToolbar(false);
-        menuManager.showMainMenu();
+        menuRenderer.showMainMenu();
     }
 
     public void render() {
-
         Block currentBlock = sceneController.getCurrentBlock();
+
         if (currentBlock != null) {
             renderer.render(currentBlock);
         } else {
@@ -59,7 +65,6 @@ public class GameManager {
     }
 
     public void handleInput() {
-
         Block currentBlock = sceneController.getCurrentBlock();
 
         if (currentBlock instanceof Choice choice && choice.hasOptions()) {
@@ -73,6 +78,7 @@ public class GameManager {
     }
 
     public void update() {
+
         if (chosenOption != null) {
             sceneController.setScene(chosenOption.getNextSceneId());
             chosenOption = null;
@@ -93,6 +99,21 @@ public class GameManager {
         sceneController.advanceBlock();
     }
 
+    public void createCharacter(String name) {
+        characterManager.createCharacter(name);
+    }
+
+    public void handleAction(Action action) {
+        String name = action.getAction();
+
+        switch (name) {
+            case "open_creator" -> requestCreator();
+            case "jump_scene" -> sceneController.setScene(action.getParams().get("id"));
+            default -> System.out.println("Unknown action: " + name);
+        }
+    }
+
+
     public void startGame() {
         console.clear();
         console.showToolbar(true);
@@ -104,8 +125,16 @@ public class GameManager {
         running = true;
     }
 
-    public boolean isRunning() {
-        return running;
+
+    public void requestSettings(){
+        console.skipWaiting();
+        gameState = GameState.SETTINGS;
+        console.showToolbar(false);
+    }
+
+    public void requestCreator(){
+        gameState = GameState.CREATOR;
+        console.showToolbar(true);
     }
 
     public void requestMenu() {
@@ -118,14 +147,6 @@ public class GameManager {
     public void requestContinue() {
         gameState = GameState.PLAYING;
         console.showToolbar(true);
-    }
-
-    public GameState getState() {
-        return gameState;
-    }
-
-    public ConsoleWindow getConsole() {
-        return console;
     }
 
     public void onExitRequested() {
@@ -145,5 +166,17 @@ public class GameManager {
     public void shutdown() {
         console.println("");
         console.printlnColored("Shutting down...", new Color(0, 255, 0));
+    }
+
+    public GameState getState() {
+        return gameState;
+    }
+
+    public ConsoleWindow getConsole() {
+        return console;
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }
