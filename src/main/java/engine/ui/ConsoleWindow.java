@@ -282,13 +282,5 @@ public class ConsoleWindow {
         inputQueue.clear();
     }
 
-    public void setResolution(int width, int height) {
-        this.width = width;
-        this.height = height;
-
-        frame.setSize(width, height);
-    }
-
-
 
 }

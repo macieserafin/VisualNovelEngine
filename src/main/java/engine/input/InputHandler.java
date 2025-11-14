@@ -26,14 +26,6 @@ public class InputHandler {
         return choice;
     }
 
-    public static String getName(){
-
-        if (console == null) {
-            throw new IllegalStateException("Console window not initialized in InputHandler!");
-        }
-
-        return console.readLine();
-    }
 
     public static String getString() {
         if (console == null) {
@@ -65,6 +57,9 @@ public class InputHandler {
 
         return name.matches("[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻż]+");
     }
+
+
+
 
 
 }
