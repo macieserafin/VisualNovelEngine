@@ -24,8 +24,7 @@ public class GameLoop {
 
             switch (state) {
                 case PLAYING -> {
-                    gameManager.render();
-                    gameManager.handleInput();
+                    gameManager.playStep();
                     gameManager.update();
                 }
                 case MAIN_MENU -> {

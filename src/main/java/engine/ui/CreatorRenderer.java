@@ -2,7 +2,6 @@ package engine.ui;
 
 import engine.core.GameManager;
 import engine.input.InputHandler;
-import engine.story.StoryManager;
 
 public class CreatorRenderer {
 

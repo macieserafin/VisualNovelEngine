@@ -18,16 +18,18 @@ import java.awt.*;
 
 public class GameManager {
     private boolean running = true;
-
-    private final StoryManager storyManager = new StoryManager();
-    private final ConsoleWindow console = new ConsoleWindow();
-    private SceneController sceneController;
-    private final RenderManager renderer = new RenderManager(console, this);
-    MenuRenderer menuRenderer = new MenuRenderer(console, this);
-    SettingsRenderer settingsRenderer = new SettingsRenderer(console, this);
-    CharacterManager characterManager = new CharacterManager();
     private GameState gameState = GameState.PLAYING;
 
+    private final ConsoleWindow console = new ConsoleWindow();
+
+    private final StoryManager storyManager = new StoryManager();
+    CharacterManager characterManager = new CharacterManager();
+
+    private RenderManager renderer;
+    private SceneController sceneController;
+
+    MenuRenderer menuRenderer = new MenuRenderer(console, this);
+    SettingsRenderer settingsRenderer = new SettingsRenderer(console, this);
 
     private Option chosenOption = null;
 
@@ -52,29 +54,35 @@ public class GameManager {
         menuRenderer.showMainMenu();
     }
 
-    public void render() {
+    public void playStep() {
         Block currentBlock = sceneController.getCurrentBlock();
 
-        if (currentBlock != null) {
-            renderer.render(currentBlock);
-        } else {
+        if (currentBlock == null) {
             console.println("");
             console.printlnColored("No active scene — end of the game.", new Color(0, 255, 0));
             exit();
+            return;
         }
-    }
 
-    public void handleInput() {
-        Block currentBlock = sceneController.getCurrentBlock();
+        if (currentBlock instanceof Action action) {
+            handleAction(action);
+            sceneController.advanceBlock();
+            return;
+        }
 
         if (currentBlock instanceof Choice choice && choice.hasOptions()) {
+            renderer.render(currentBlock);
             int choiceIndex = InputHandler.getChoice(1, choice.getOptions().size());
             chosenOption = choice.getOptions().get(choiceIndex - 1);
-        } else {
-            console.showPrompt("[Press Enter to continue...]");
-            console.waitForEnter();
-            console.hidePrompt();
+            return;
         }
+
+        renderer.render(currentBlock);
+        console.showPrompt("[Press Enter to continue...]");
+        console.waitForEnter();
+        console.hidePrompt();
+
+        sceneController.advanceBlock();
     }
 
     public void update() {
@@ -96,7 +104,6 @@ public class GameManager {
             return;
         }
 
-        sceneController.advanceBlock();
     }
 
     public void createCharacter(String name) {
@@ -113,14 +120,16 @@ public class GameManager {
         }
     }
 
-
     public void startGame() {
         console.clear();
         console.showToolbar(true);
         console.printlnColored("[Starting new game...]\n", new Color(0, 255, 0));
 
         StoryInitializer.setup(storyManager);
+
         sceneController = new SceneController(storyManager);
+        renderer = new RenderManager(console);
+
         gameState = GameState.PLAYING;
         running = true;
     }
