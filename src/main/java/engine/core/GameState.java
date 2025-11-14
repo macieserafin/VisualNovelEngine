@@ -2,5 +2,8 @@ package engine.core;
 
 public enum GameState {
     MAIN_MENU,
-    PLAYING
+    PLAYING,
+    SETTINGS,
+    CREATOR,
+    EXITING
 }

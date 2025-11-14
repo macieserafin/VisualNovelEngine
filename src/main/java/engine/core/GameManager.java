@@ -1,29 +1,33 @@
 package engine.core;
 
+import engine.character.CharacterManager;
 import engine.input.InputHandler;
 import engine.story.Option;
 import engine.story.SceneController;
 import engine.story.StoryManager;
+import engine.story.blocks.Action;
 import engine.story.blocks.Block;
 import engine.story.blocks.Choice;
-import engine.ui.ConsoleWindow;
-import engine.ui.MenuManager;
-import engine.ui.RenderManager;
+import engine.ui.*;
 import game.StoryInitializer;
 
 import java.awt.*;
 
 public class GameManager {
     private boolean running = true;
-
-    private final StoryManager storyManager = new StoryManager();
-    private final ConsoleWindow console = new ConsoleWindow("Visual Novel Engine", 1000, 1000);
-    private final RenderManager renderer = new RenderManager(console);
-    private SceneController sceneController;
-    MenuManager menuManager = new MenuManager(console, this);
     private GameState gameState = GameState.PLAYING;
 
+    private final ConsoleWindow console = new ConsoleWindow();
+
+    private final StoryManager storyManager = new StoryManager();
+    CharacterManager characterManager = new CharacterManager();
+
+    private RenderManager renderer;
+    private SceneController sceneController;
+
     private Option chosenOption = null;
+    private String pausedSceneId = null;
+    private int pausedBlockIndex = -1;
 
     public void initialize() {
 
@@ -32,7 +36,7 @@ public class GameManager {
 
             @Override public void onLoad() { /* TODO */ }
 
-            @Override public void onSettings() { /* TODO */ }
+            @Override public void onSettings() { requestSettings(); }
 
             @Override public void onMenu() { requestMenu(); }
 
@@ -43,54 +47,109 @@ public class GameManager {
         InputHandler.initialize(console);
 
         console.showToolbar(false);
-        menuManager.showMainMenu();
+        stepMainMenu();
     }
 
-    public void render() {
+    public void playStep() {
+
+        switch (gameState) {
+
+            case MAIN_MENU -> stepMainMenu();
+            case SETTINGS  -> stepSettings();
+            case CREATOR   -> stepCreator();
+            case PLAYING   -> stepPlaying();
+            case EXITING   -> running = false;
+        }
+    }
+
+    private void stepMainMenu() {
+        console.clear();
+        console.println("=== VISUAL NOVEL ENGINE ===");
+        console.println("1. Start Game");
+        console.println("2. Exit");
+
+        int choice = InputHandler.getChoice(1, 2);
+
+        if (choice == 1) startGame();
+        else onExitRequested();
+    }
+
+    private void stepSettings() {
+        console.clear();
+        console.println("=== SETTINGS ===");
+        console.println("[1] Back");
+
+        InputHandler.getChoice(1, 1);
+        requestContinue();
+    }
+
+    private void stepCreator() {
+        console.clear();
+        console.println("=== What's your name? ===");
+
+        String input = InputHandler.getString();
+        createCharacter(input);
+        requestContinue();
+    }
+
+
+    private void stepPlaying() {
 
         Block currentBlock = sceneController.getCurrentBlock();
-        if (currentBlock != null) {
-            renderer.render(currentBlock);
-        } else {
-            console.println("");
+
+        if (currentBlock == null) {
             console.printlnColored("No active scene — end of the game.", new Color(0, 255, 0));
             exit();
+            return;
         }
-    }
 
-    public void handleInput() {
-
-        Block currentBlock = sceneController.getCurrentBlock();
+        if (currentBlock instanceof Action action) {
+            handleAction(action);
+            sceneController.advanceBlock();
+            return;
+        }
 
         if (currentBlock instanceof Choice choice && choice.hasOptions()) {
+            renderer.render(currentBlock);
             int choiceIndex = InputHandler.getChoice(1, choice.getOptions().size());
             chosenOption = choice.getOptions().get(choiceIndex - 1);
-        } else {
-            console.showPrompt("[Press Enter to continue...]");
-            console.waitForEnter();
-            console.hidePrompt();
+            applyChoice();
+            return;
+        }
+
+        renderer.render(currentBlock);
+        console.showPrompt("[Press Enter to continue...]");
+        console.waitForEnter();
+        console.hidePrompt();
+
+        sceneController.advanceBlock();
+        handleEndOfScene();
+    }
+
+    private void applyChoice() {
+        sceneController.setScene(chosenOption.getNextSceneId());
+        chosenOption = null;
+    }
+
+    private void handleEndOfScene() {
+        if (sceneController.isSceneEnded()) {
+            console.printlnColored("[End of scene / day]", new Color(0, 255, 0));
+            requestMenu();
         }
     }
 
-    public void update() {
-        if (chosenOption != null) {
-            sceneController.setScene(chosenOption.getNextSceneId());
-            chosenOption = null;
-            return;
+    public void createCharacter(String name) {
+        characterManager.createCharacter(name);
+    }
+
+    public void handleAction(Action action) {
+        String name = action.getAction();
+
+        switch (name) {
+            case "open_creator" -> requestCreator();
+            case "jump_scene" -> sceneController.setScene(action.getParams().get("id"));
+            default -> System.out.println("Unknown action: " + name);
         }
-
-        if (sceneController.isSceneEnded()) {
-            console.println("");
-            console.printlnColored("[End of scene / day]", new Color(0, 255, 0));
-
-            if (sceneController.getCurrentBlock() == null) {
-                console.waitForEnter();
-                exit();
-            }
-            return;
-        }
-
-        sceneController.advanceBlock();
     }
 
     public void startGame() {
@@ -99,13 +158,32 @@ public class GameManager {
         console.printlnColored("[Starting new game...]\n", new Color(0, 255, 0));
 
         StoryInitializer.setup(storyManager);
+
         sceneController = new SceneController(storyManager);
+        renderer = new RenderManager(console);
+
         gameState = GameState.PLAYING;
         running = true;
     }
 
-    public boolean isRunning() {
-        return running;
+
+    public void requestSettings() {
+        console.skipWaiting();
+        gameState = GameState.SETTINGS;
+        console.showToolbar(false);
+
+        pausedSceneId = sceneController.getCurrentScene().getId();
+        pausedBlockIndex = sceneController.getCurrentBlockIndex();
+
+    }
+
+
+
+    public void requestCreator(){
+        gameState = GameState.CREATOR;
+        console.showToolbar(true);
+
+        console.clear();
     }
 
     public void requestMenu() {
@@ -115,18 +193,23 @@ public class GameManager {
 
     }
 
+
     public void requestContinue() {
+        if (pausedSceneId != null) {
+            sceneController.setScene(pausedSceneId);
+            sceneController.setBlockIndex(pausedBlockIndex);
+        }
+
+        pausedSceneId = null;
+        pausedBlockIndex = -1;
+
+        console.clearInputQueue();
+        console.clear();
+
         gameState = GameState.PLAYING;
         console.showToolbar(true);
     }
 
-    public GameState getState() {
-        return gameState;
-    }
-
-    public ConsoleWindow getConsole() {
-        return console;
-    }
 
     public void onExitRequested() {
         console.println("");
@@ -145,5 +228,10 @@ public class GameManager {
     public void shutdown() {
         console.println("");
         console.printlnColored("Shutting down...", new Color(0, 255, 0));
+    }
+
+
+    public boolean isRunning() {
+        return running;
     }
 }

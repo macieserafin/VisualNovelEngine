@@ -34,6 +34,21 @@ public class SceneController {
         return currentScene != null && currentBlockIndex >= currentScene.getBlocks().size();
     }
 
+    public int getCurrentBlockIndex() {
+        return currentBlockIndex;
+    }
+
+    public void setBlockIndex(int index) {
+        if (index < 0) index = 0;
+
+        if (currentScene != null) {
+            int max = currentScene.getBlocks().size() - 1;
+            if (index > max) index = max;
+        }
+
+        this.currentBlockIndex = index;
+    }
+
     public boolean isEndingScene() {
         return currentScene != null && currentScene.isEndingScene();
     }

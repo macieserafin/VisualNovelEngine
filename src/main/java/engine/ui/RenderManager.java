@@ -1,6 +1,8 @@
 package engine.ui;
 
+import engine.core.GameManager;
 import engine.story.Option;
+import engine.story.SceneController;
 import engine.story.blocks.*;
 import engine.story.blocks.Choice;
 
@@ -32,7 +34,9 @@ public class RenderManager {
                 renderMonologue(m);
             } else if (block instanceof Choice c) {
                 renderChoice(c);
-            } else {
+            } else if (block instanceof Action a) {
+                return;
+            }else {
                 console.println("[Unknown block]");
             }
         } catch (InterruptedException e) {
@@ -72,4 +76,44 @@ public class RenderManager {
             console.printlnColored("  " + (i + 1) + ". " + opt.getDescription(), COLOR_CHOICE);
         }
     }
+
+//    private int readInt() {
+//        while (true) {
+//            String line = console.readLine();
+//            try {
+//                return Integer.parseInt(line.trim());
+//            } catch (NumberFormatException e) {
+//                console.println("Invalid number, try again:");
+//            }
+//        }
+//    }
+//
+//    public int renderMenu(){
+//        console.clear();
+//        console.println("=== VISUAL NOVEL ENGINE ===");
+//        console.println("1. Start Game");
+//        console.println("2. Exit");
+//        console.print("\nChoose an option [1-2]: ");
+//        return readInt();
+//    }
+//
+//    public int renderSettings(){
+//        console.clear();
+//        console.println("=== SETTINGS ===");
+//        console.println("");
+//        console.println("[1] -> Exit Settings...");
+//        return readInt();
+//    }
+//
+//    public String renderCreator(){
+//        console.clear();
+//        console.println("=== What's your name? ===");
+//        return console.readLine();
+//
+//    }
+//
+//    public void renderCreatorSuccess() {
+//        console.println("Character created successfully!");
+//        console.println("");
+//    }
 }
