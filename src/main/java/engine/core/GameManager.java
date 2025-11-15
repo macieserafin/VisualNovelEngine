@@ -168,13 +168,12 @@ public class GameManager {
 
 
     public void requestSettings() {
+        pausedSceneId = sceneController.getCurrentScene().getId();
+        pausedBlockIndex = sceneController.getCurrentBlockIndex();
         console.skipWaiting();
         gameState = GameState.SETTINGS;
         console.showToolbar(false);
-
-        pausedSceneId = sceneController.getCurrentScene().getId();
-        pausedBlockIndex = sceneController.getCurrentBlockIndex();
-
+        
     }
 
 
