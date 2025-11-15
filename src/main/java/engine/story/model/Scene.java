@@ -1,8 +1,9 @@
-package engine.story;
+package engine.story.model;
 
 import engine.story.blocks.Block;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Scene {
@@ -15,13 +16,28 @@ public class Scene {
         this.id = id;
     }
 
+    public Scene(String id, Block... blocks) {
+        this.id = id;
+        this.blocks.addAll(Arrays.asList(blocks));
+    }
+
     public String getId() {
         return id;
     }
 
-    public Scene addBlock(Block block) {
+    public void addBlock(Block block) {
         blocks.add(block);
-        return this;
+    }
+
+    public Block getBlock(int index) {
+        if (index < 0 || index >= blocks.size()) {
+            return null;
+        }
+        return blocks.get(index);
+    }
+
+    public int getBlockCount() {
+        return blocks.size();
     }
 
     public List<Block> getBlocks() {

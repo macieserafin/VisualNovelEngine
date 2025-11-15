@@ -1,8 +1,6 @@
 package engine.ui;
 
-import engine.core.GameManager;
-import engine.story.Option;
-import engine.story.SceneController;
+import engine.story.blocks.Option;
 import engine.story.blocks.*;
 import engine.story.blocks.Choice;
 

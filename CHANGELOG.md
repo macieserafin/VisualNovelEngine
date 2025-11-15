@@ -1,5 +1,21 @@
 # Visual Novel Engine — Changelog
 
+## v0.1.4 (Hierarchical Story Structure Update)
+
+- Introduced full hierarchical story architecture (Story → Day → Section → Scene → Block)
+- Refactored StoryManager for manual scene/block navigation
+- Implemented updated SceneController with scene/block handling
+- Restructured project layout: story/model, story/blocks, story/controller
+- Moved Option into blocks package
+- Updated GameManager flow to new story system
+- Added complete new Test story for multi-scene testing
+- Improved clarity, scalability and future feature readiness
+
+This update introduces the new internal architecture for story flow,
+replacing the old flat scene system with a structured, scalable model.
+It restructures the engine in preparation for future logic, save/load
+mechanics and full branching narrative support.
+
 ## v0.1.3 (Major Engine Refactor — Unified Flow, Scene Control & Stable Settings)
 - Merged full engine refactor from `refactor-engine`
 - Moved entire game loop logic into GameManager (single-step state machine)

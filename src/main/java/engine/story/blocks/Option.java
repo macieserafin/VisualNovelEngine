@@ -1,4 +1,4 @@
-package engine.story;
+package engine.story.blocks;
 
 public class Option {
     private String description; // in game

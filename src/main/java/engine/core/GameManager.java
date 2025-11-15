@@ -2,28 +2,30 @@ package engine.core;
 
 import engine.character.CharacterManager;
 import engine.input.InputHandler;
-import engine.story.Option;
-import engine.story.SceneController;
-import engine.story.StoryManager;
+import engine.story.blocks.Option;
+import engine.story.controller.SceneController;
+import engine.story.controller.StoryManager;
 import engine.story.blocks.Action;
 import engine.story.blocks.Block;
 import engine.story.blocks.Choice;
-import engine.ui.*;
+import engine.ui.ConsoleWindow;
+import engine.ui.RenderManager;
 import game.StoryInitializer;
 
 import java.awt.*;
 
 public class GameManager {
+
     private boolean running = true;
     private GameState gameState = GameState.PLAYING;
 
     private final ConsoleWindow console = new ConsoleWindow();
 
     private final StoryManager storyManager = new StoryManager();
-    CharacterManager characterManager = new CharacterManager();
-
-    private RenderManager renderer;
     private SceneController sceneController;
+    private RenderManager renderer;
+
+    private CharacterManager characterManager = new CharacterManager();
 
     private Option chosenOption = null;
     private String pausedSceneId = null;
@@ -40,9 +42,8 @@ public class GameManager {
 
             @Override public void onMenu() { requestMenu(); }
 
-            @Override public void onExit() {onExitRequested();}
+            @Override public void onExit() { onExitRequested(); }
         });
-
 
         InputHandler.initialize(console);
 
@@ -51,9 +52,7 @@ public class GameManager {
     }
 
     public void playStep() {
-
         switch (gameState) {
-
             case MAIN_MENU -> stepMainMenu();
             case SETTINGS  -> stepSettings();
             case CREATOR   -> stepCreator();
@@ -92,11 +91,9 @@ public class GameManager {
         requestContinue();
     }
 
-
     private void stepPlaying() {
 
         Block currentBlock = sceneController.getCurrentBlock();
-
         if (currentBlock == null) {
             console.printlnColored("No active scene — end of the game.", new Color(0, 255, 0));
             exit();
@@ -105,14 +102,16 @@ public class GameManager {
 
         if (currentBlock instanceof Action action) {
             handleAction(action);
-            sceneController.advanceBlock();
+            sceneController.nextBlock();     // NOWA METODA
             return;
         }
 
         if (currentBlock instanceof Choice choice && choice.hasOptions()) {
             renderer.render(currentBlock);
+
             int choiceIndex = InputHandler.getChoice(1, choice.getOptions().size());
             chosenOption = choice.getOptions().get(choiceIndex - 1);
+
             applyChoice();
             return;
         }
@@ -122,18 +121,19 @@ public class GameManager {
         console.waitForEnter();
         console.hidePrompt();
 
-        sceneController.advanceBlock();
-        handleEndOfScene();
+        boolean moved = sceneController.nextBlock();     // ZWRACA false jeśli koniec sceny
+
+        if (!moved) handleEndOfScene();
     }
 
     private void applyChoice() {
-        sceneController.setScene(chosenOption.getNextSceneId());
+        sceneController.goToScene(chosenOption.getNextSceneId());
         chosenOption = null;
     }
 
     private void handleEndOfScene() {
         if (sceneController.isSceneEnded()) {
-            console.printlnColored("[End of scene / day]", new Color(0, 255, 0));
+            console.printlnColored("[End of scene]", new Color(0, 255, 0));
             requestMenu();
         }
     }
@@ -147,7 +147,12 @@ public class GameManager {
 
         switch (name) {
             case "open_creator" -> requestCreator();
-            case "jump_scene" -> sceneController.setScene(action.getParams().get("id"));
+
+            case "jump_scene" -> {
+                String id = action.getParams().get("id");
+                sceneController.goToScene(id);
+            }
+
             default -> System.out.println("Unknown action: " + name);
         }
     }
@@ -158,7 +163,6 @@ public class GameManager {
         console.printlnColored("[Starting new game...]\n", new Color(0, 255, 0));
 
         StoryInitializer.setup(storyManager);
-
         sceneController = new SceneController(storyManager);
         renderer = new RenderManager(console);
 
@@ -166,22 +170,18 @@ public class GameManager {
         running = true;
     }
 
-
     public void requestSettings() {
         pausedSceneId = sceneController.getCurrentScene().getId();
         pausedBlockIndex = sceneController.getCurrentBlockIndex();
+
         console.skipWaiting();
         gameState = GameState.SETTINGS;
         console.showToolbar(false);
-
     }
 
-
-
-    public void requestCreator(){
+    public void requestCreator() {
         gameState = GameState.CREATOR;
         console.showToolbar(true);
-
         console.clear();
     }
 
@@ -189,13 +189,11 @@ public class GameManager {
         console.skipWaiting();
         gameState = GameState.MAIN_MENU;
         console.showToolbar(false);
-
     }
-
 
     public void requestContinue() {
         if (pausedSceneId != null) {
-            sceneController.setScene(pausedSceneId);
+            sceneController.goToScene(pausedSceneId);
             sceneController.setBlockIndex(pausedBlockIndex);
         }
 
@@ -208,7 +206,6 @@ public class GameManager {
         gameState = GameState.PLAYING;
         console.showToolbar(true);
     }
-
 
     public void onExitRequested() {
         console.println("");
@@ -228,7 +225,6 @@ public class GameManager {
         console.println("");
         console.printlnColored("Shutting down...", new Color(0, 255, 0));
     }
-
 
     public boolean isRunning() {
         return running;

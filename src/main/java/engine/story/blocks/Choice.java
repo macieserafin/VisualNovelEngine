@@ -1,6 +1,5 @@
 package engine.story.blocks;
 
-import engine.story.Option;
 import java.util.ArrayList;
 import java.util.List;
 
