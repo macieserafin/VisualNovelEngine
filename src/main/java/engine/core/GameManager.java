@@ -173,7 +173,7 @@ public class GameManager {
         console.skipWaiting();
         gameState = GameState.SETTINGS;
         console.showToolbar(false);
-        
+
     }
 
 

@@ -1,5 +1,24 @@
 # Visual Novel Engine — Changelog
 
+## v0.1.3 (Major Engine Refactor — Unified Flow, Scene Control & Stable Settings)
+- Merged full engine refactor from `refactor-engine`
+- Moved entire game loop logic into GameManager (single-step state machine)
+- Simplified state system: `MAIN_MENU`, `PLAYING`, `SETTINGS`, `CREATOR`, `EXITING`
+- Removed legacy GameLoop and outdated managers
+- Added Action block (`open_creator`, `jump_scene`)
+- Implemented scene pause & resume when opening Settings:
+    - Saves current `sceneId` and `blockIndex`
+    - Restores exact block position after returning from Settings
+- Improved SceneController with direct block index control
+- Fixed input issues and removed extra Enter after returning from menus
+- Rewritten Menu, Settings and Creator screens as GameManager steps
+- Cleaned up UI logic and removed unused code
+- Improved stability of scene switching, block progression and user flow
+
+This update finalizes the internal architecture of the engine,
+providing a stable foundation for adding more advanced gameplay
+features, UI screens and story mechanics in future versions.
+
 ## v0.1.2 (Main Menu & Flow Update)
 - Added Main Menu displayed immediately on startup
 - Added 'Start Game' and 'Exit' options
