@@ -1,6 +1,7 @@
 package engine.story.controller;
 
 import engine.story.blocks.Block;
+import engine.story.jump.JumpTarget;
 import engine.story.model.Scene;
 
 public class SceneController {
@@ -33,6 +34,9 @@ public class SceneController {
         );
     }
 
+    public void goTo(JumpTarget target) {
+        storyManager.goTo(target);
+    }
 
     public Scene getCurrentScene() {
         return storyManager.getCurrentScene();

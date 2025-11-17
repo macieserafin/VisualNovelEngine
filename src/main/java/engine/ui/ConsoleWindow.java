@@ -33,7 +33,6 @@ public class ConsoleWindow {
     public static final Color COLOR_INPUT_BG = new Color(18, 18, 18);
     public static final Color COLOR_TOOLBAR = new Color(25, 25, 25);
 
-
     public interface ToolbarListener {
         void onSave();
         void onLoad();
@@ -68,6 +67,7 @@ public class ConsoleWindow {
             }
         });
 
+        // Toolbar
         toolbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 5));
         toolbarPanel.setBackground(COLOR_TOOLBAR);
         toolbarPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
@@ -84,6 +84,7 @@ public class ConsoleWindow {
         toolbarPanel.add(bMenu);
         toolbarPanel.add(bExit);
 
+        // TEXT AREA
         textArea = new JTextPane();
         textArea.setEditable(false);
         textArea.setBackground(new Color(20, 20, 20));
@@ -93,8 +94,16 @@ public class ConsoleWindow {
 
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setBorder(null);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        scrollPane.setPreferredSize(new Dimension(width, 600)); // TEXT AREA HEIGHT
+
+        // GAP PANEL 40px
+        JPanel gapPanel = new JPanel();
+        gapPanel.setPreferredSize(new Dimension(width, 40));
+        gapPanel.setBackground(COLOR_BG);
 
         promptLabel = new JLabel(" ");
         promptLabel.setForeground(COLOR_PROMPT);
@@ -120,8 +129,14 @@ public class ConsoleWindow {
         bottomPanel.add(promptLabel, BorderLayout.NORTH);
         bottomPanel.add(inputField, BorderLayout.CENTER);
 
+        // CENTER PANEL (TEXT + GAP)
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(COLOR_BG);
+        centerPanel.add(scrollPane, BorderLayout.CENTER);
+        centerPanel.add(gapPanel, BorderLayout.SOUTH);
+
         frame.add(toolbarPanel, BorderLayout.NORTH);
-        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(centerPanel, BorderLayout.CENTER);
         frame.add(bottomPanel, BorderLayout.SOUTH);
 
         frame.addMouseListener(new MouseAdapter() {
@@ -149,24 +164,31 @@ public class ConsoleWindow {
 
     public void showToolbar(boolean visible) { toolbarPanel.setVisible(visible); }
 
+    private void scrollToBottom() {
+        SwingUtilities.invokeLater(() -> {
+            textArea.setCaretPosition(textArea.getDocument().getLength());
+        });
+    }
+
+
     public void print(String text) {
         try {
             StyledDocument doc = textArea.getStyledDocument();
             doc.insertString(doc.getLength(), text, null);
-            textArea.setCaretPosition(doc.getLength());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+        scrollToBottom();
     }
 
     public void println(String text) {
         try {
             StyledDocument doc = textArea.getStyledDocument();
             doc.insertString(doc.getLength(), text + "\n", null);
-            textArea.setCaretPosition(doc.getLength());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+        scrollToBottom();
     }
 
     public void clear() { textArea.setText(""); }
@@ -174,9 +196,9 @@ public class ConsoleWindow {
     public void type(String text, int delayMs) throws InterruptedException {
         StyledDocument doc = textArea.getStyledDocument();
         for (char c : text.toCharArray()) {
+
             try {
                 doc.insertString(doc.getLength(), String.valueOf(c), null);
-                textArea.setCaretPosition(doc.getLength());
                 Thread.sleep(delayMs);
             } catch (BadLocationException e) {
                 e.printStackTrace();
@@ -187,6 +209,7 @@ public class ConsoleWindow {
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+        scrollToBottom();
     }
 
     public String readLine() {
@@ -231,14 +254,15 @@ public class ConsoleWindow {
         StyleConstants.setFontSize(attrs, 16);
         try {
             doc.insertString(doc.getLength(), text, attrs);
-            textArea.setCaretPosition(doc.getLength());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+        scrollToBottom();
     }
 
     public void printlnColored(String text, Color color) {
         printColored(text + "\n", color);
+        scrollToBottom();
     }
 
     public void typeColored(String text, int delayMs, Color color) throws InterruptedException {
@@ -248,7 +272,6 @@ public class ConsoleWindow {
         for (char c : text.toCharArray()) {
             try {
                 doc.insertString(doc.getLength(), String.valueOf(c), attrs);
-                textArea.setCaretPosition(doc.getLength());
                 Thread.sleep(delayMs);
             } catch (BadLocationException e) {
                 e.printStackTrace();
@@ -259,6 +282,7 @@ public class ConsoleWindow {
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
+        scrollToBottom();
     }
 
     public void skipWaiting() {
@@ -281,6 +305,4 @@ public class ConsoleWindow {
     public void clearInputQueue() {
         inputQueue.clear();
     }
-
-
 }

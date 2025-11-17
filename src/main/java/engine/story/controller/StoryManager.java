@@ -1,6 +1,7 @@
 package engine.story.controller;
 
 import engine.story.blocks.Block;
+import engine.story.jump.JumpTarget;
 import engine.story.model.Day;
 import engine.story.model.Scene;
 import engine.story.model.Section;
@@ -111,6 +112,38 @@ public class StoryManager {
         }
     }
 
+    public void goTo(JumpTarget target) {
+
+        if (target.isJumpToDay()) {
+            currentDayIndex = target.day;
+            currentSectionIndex = 0;
+            currentSceneIndex = 0;
+            currentBlockIndex = 0;
+            return;
+        }
+
+        if (target.isJumpToSection()) {
+            currentDayIndex = target.day;
+            currentSectionIndex = target.section;
+            currentSceneIndex = 0;
+            currentBlockIndex = 0;
+            return;
+        }
+
+        if (target.isJumpToScene()) {
+            currentDayIndex = target.day;
+            currentSectionIndex = target.section;
+            currentSceneIndex = target.scene;
+            currentBlockIndex = 0;
+            return;
+        }
+
+        // FULL BLOCK JUMP
+        currentDayIndex = target.day;
+        currentSectionIndex = target.section;
+        currentSceneIndex = target.scene;
+        currentBlockIndex = target.block;
+    }
 
     public void setPosition(int dayIndex, int sectionIndex, int sceneIndex, int blockIndex) {
         this.currentDayIndex = dayIndex;

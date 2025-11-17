@@ -6,6 +6,8 @@ import engine.story.model.Day;
 import engine.story.model.Scene;
 import engine.story.model.Section;
 import engine.story.model.Story;
+import engine.story.jump.Jump;
+import engine.story.jump.JumpTarget;
 
 public class Test {
 
@@ -33,6 +35,9 @@ public class Test {
         choiceStart.addOption(new Option("Try Creator Test", "creatorTest"));
         choiceStart.addOption(new Option("Go to Ending", "end"));
 
+        // JUMP TEST
+        choiceStart.addOption(new Option("JUMP TEST → Jump to Scene B (action)", "jumpTest"));
+
         start.addBlock(choiceStart);
 
         intro.addScene(start);
@@ -50,6 +55,19 @@ public class Test {
         creatorTest.addBlock(creatorChoice);
 
         intro.addScene(creatorTest);
+
+        // ---------- SCENE: jumpTest----------
+        Scene jumpTest = new Scene("jumpTest");
+        jumpTest.addBlock(new Narrative("=== JUMP TEST SCENE ==="));
+        jumpTest.addBlock(new Narrative("This scene will demonstrate jump functionality."));
+
+        // JUMP ACTION
+        jumpTest.addBlock(new Action(Jump.toScene(0, 1, 1)));
+        // (day=0, section=1, scene=1) → sceneB
+
+        jumpTest.addBlock(new Narrative("You should never see this text."));
+
+        intro.addScene(jumpTest);
 
         day1.addSection(intro);
 

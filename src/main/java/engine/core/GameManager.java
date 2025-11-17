@@ -8,6 +8,7 @@ import engine.story.controller.StoryManager;
 import engine.story.blocks.Action;
 import engine.story.blocks.Block;
 import engine.story.blocks.Choice;
+import engine.story.jump.JumpTarget;
 import engine.ui.ConsoleWindow;
 import engine.ui.RenderManager;
 import game.StoryInitializer;
@@ -147,12 +148,14 @@ public class GameManager {
 
         switch (name) {
             case "open_creator" -> requestCreator();
-
             case "jump_scene" -> {
                 String id = action.getParams().get("id");
                 sceneController.goToScene(id);
             }
-
+            case "jump" -> {
+                JumpTarget target = action.getTarget();
+                sceneController.goTo(target);
+            }
             default -> System.out.println("Unknown action: " + name);
         }
     }

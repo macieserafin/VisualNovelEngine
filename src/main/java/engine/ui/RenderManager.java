@@ -16,7 +16,6 @@ public class RenderManager {
     private static final Color COLOR_DIALOGUE_TEXT = new Color(240, 240, 240);
     private static final Color COLOR_MONOLOGUE = new Color(119, 119, 119);
     private static final Color COLOR_CHOICE = new Color(213, 255, 252);
-    private static final Color COLOR_SEPARATOR = new Color(80, 80, 80);
 
     public RenderManager(ConsoleWindow console) {
         this.console = console;
@@ -75,43 +74,4 @@ public class RenderManager {
         }
     }
 
-//    private int readInt() {
-//        while (true) {
-//            String line = console.readLine();
-//            try {
-//                return Integer.parseInt(line.trim());
-//            } catch (NumberFormatException e) {
-//                console.println("Invalid number, try again:");
-//            }
-//        }
-//    }
-//
-//    public int renderMenu(){
-//        console.clear();
-//        console.println("=== VISUAL NOVEL ENGINE ===");
-//        console.println("1. Start Game");
-//        console.println("2. Exit");
-//        console.print("\nChoose an option [1-2]: ");
-//        return readInt();
-//    }
-//
-//    public int renderSettings(){
-//        console.clear();
-//        console.println("=== SETTINGS ===");
-//        console.println("");
-//        console.println("[1] -> Exit Settings...");
-//        return readInt();
-//    }
-//
-//    public String renderCreator(){
-//        console.clear();
-//        console.println("=== What's your name? ===");
-//        return console.readLine();
-//
-//    }
-//
-//    public void renderCreatorSuccess() {
-//        console.println("Character created successfully!");
-//        console.println("");
-//    }
 }
